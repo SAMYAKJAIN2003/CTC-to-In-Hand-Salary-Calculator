@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTC to In-Hand Salary Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Creator Credit -->
+    <div class="absolute top-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg z-50">
+        <p class="text-sm font-medium">Created by SAMYAK JAIN</p>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="min-h-screen flex flex-col">
+        <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+            <div class="container mx-auto px-4">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4 text-center">
+                    CTC to In-Hand Salary Calculator
+                </h1>
+                <p class="text-xl text-center text-blue-100">
+                    Calculate your actual take-home salary after all deductions
+                </p>
+            </div>
+        </div>
+
+        <!-- Calculator Form -->
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-8">
+                <form id="salaryForm" class="space-y-6">
+                    <!-- CTC Input -->
+                    <div>
+                        <label for="ctc" class="block text-lg font-medium text-gray-700 mb-2">
+                            Annual CTC (Cost to Company)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">₹</span>
+                            <input 
+                                type="text" 
+                                id="ctc" 
+                                name="ctc" 
+                                required
+                                pattern="[0-9]*"
+                                inputmode="numeric"
+                                class="pl-8 w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter your annual CTC"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Additional Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="age" class="block text-lg font-medium text-gray-700 mb-2">
+                                Age Group
+                            </label>
+                            <select id="age" name="age" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="below30">Below 30</option>
+                                <option value="30to60">30 - 60</option>
+                                <option value="above60">Above 60</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="location" class="block text-lg font-medium text-gray-700 mb-2">
+                                Location
+                            </label>
+                            <select id="location" name="location" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="metro">Metro City</option>
+                                <option value="tier2">Tier 2 City</option>
+                                <option value="tier3">Tier 3 City</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Calculate Button -->
+                    <div class="pt-4">
+                        <button 
+                            type="button"
+                            onclick="calculateSalary()"
+                            class="w-full bg-blue-600 text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-2"
+                        >
+                            <i class="fas fa-calculator"></i>
+                            Calculate In-Hand Salary
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Result Section -->
+            <div id="result" class="max-w-2xl mx-auto mt-8 bg-white rounded-xl shadow-lg p-8 border-t-4 border-blue-600">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Salary Breakdown</h2>
+                
+                <!-- Monthly In-hand -->
+                <div class="bg-blue-50 p-6 rounded-lg mb-6">
+                    <h3 class="text-xl font-semibold text-blue-800">Monthly In-hand Salary</h3>
+                    <p id="monthlyInHand" class="text-3xl font-bold text-blue-600 mt-2">₹0</p>
+                </div>
+
+                <!-- Detailed Breakdown -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">Annual CTC:</p>
+                        <p id="annualCtc" class="text-right font-semibold">₹0</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">Basic Salary (Monthly):</p>
+                        <p id="basicSalary" class="text-right font-semibold">₹0</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">HRA (Monthly):</p>
+                        <p id="hra" class="text-right font-semibold">₹0</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">PF Deduction (Monthly):</p>
+                        <p id="pfDeduction" class="text-right font-semibold text-red-600">-₹0</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">Professional Tax (Monthly):</p>
+                        <p id="professionalTax" class="text-right font-semibold text-red-600">-₹0</p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+                        <p class="text-gray-600">Income Tax (Monthly):</p>
+                        <p id="incomeTax" class="text-right font-semibold text-red-600">-₹0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculateSalary() {
+            console.log('Calculating salary...');
+            
+            // Get input value and validate
+            const ctcInput = document.getElementById('ctc');
+            const ctcValue = ctcInput.value.replace(/[^0-9]/g, '');
+            const ctc = parseFloat(ctcValue);
+            
+            if (!ctcValue || !ctc || ctc <= 0) {
+                alert('Please enter a valid CTC amount');
+                return;
+            }
+            
+            console.log('CTC value:', ctc);
+
+            try {
+                console.log('Starting calculations...');
+                
+                // Monthly calculations
+                const monthlyCtc = ctc / 12;
+                const basicSalary = monthlyCtc * 0.5; // 50% of monthly CTC
+                const hra = basicSalary * 0.4; // 40% of basic salary
+                const pfDeduction = basicSalary * 0.12; // 12% of basic salary
+                const professionalTax = 200; // Fixed professional tax
+
+                console.log('Monthly values calculated:', {
+                    monthlyCtc,
+                    basicSalary,
+                    hra,
+                    pfDeduction,
+                    professionalTax
+                });
+                // 👇 Add this to scroll down to the result section
+
+
+
+                // Calculate annual taxable income
+                const standardDeduction = 50000;
+                const taxableIncome = ctc - (standardDeduction + (pfDeduction * 12));
+                console.log('Taxable income:', taxableIncome);
+
+                // Calculate income tax (simplified slabs)
+                let annualTax = 0;
+                if (taxableIncome > 1500000) {
+                    annualTax = (taxableIncome - 1500000) * 0.3 + 187500;
+                } else if (taxableIncome > 1250000) {
+                    annualTax = (taxableIncome - 1250000) * 0.25 + 125000;
+                } else if (taxableIncome > 1000000) {
+                    annualTax = (taxableIncome - 1000000) * 0.20 + 75000;
+                } else if (taxableIncome > 750000) {
+                    annualTax = (taxableIncome - 750000) * 0.15 + 37500;
+                } else if (taxableIncome > 500000) {
+                    annualTax = (taxableIncome - 500000) * 0.10 + 12500;
+                } else if (taxableIncome > 250000) {
+                    annualTax = (taxableIncome - 250000) * 0.05;
+                }
+
+                console.log('Annual tax calculated:', annualTax);
+                const monthlyTax = annualTax / 12;
+                const monthlyInHand = monthlyCtc - (pfDeduction + professionalTax + monthlyTax);
+                console.log('Final monthly in-hand:', monthlyInHand);
+
+                // Update all values with calculation results
+                const updates = {
+                    'monthlyInHand': `₹${Math.round(monthlyInHand).toLocaleString('en-IN')}`,
+                    'annualCtc': `₹${Math.round(ctc).toLocaleString('en-IN')}`,
+                    'basicSalary': `₹${Math.round(basicSalary).toLocaleString('en-IN')}`,
+                    'hra': `₹${Math.round(hra).toLocaleString('en-IN')}`,
+                    'pfDeduction': `-₹${Math.round(pfDeduction).toLocaleString('en-IN')}`,
+                    'professionalTax': `-₹${professionalTax.toLocaleString('en-IN')}`,
+                    'incomeTax': `-₹${Math.round(monthlyTax).toLocaleString('en-IN')}`
+                };
+
+                Object.entries(updates).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    element.textContent = value;
+                    element.classList.add('text-blue-600');
+                    setTimeout(() => element.classList.remove('text-blue-600'), 200);
+                });
+
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+                Object.entries(updates).forEach(([id, value]) => {
+                    const element = document.getElementById(id);
+                    element.textContent = value;
+                    element.classList.add('text-blue-600');
+                    setTimeout(() => element.classList.remove('text-blue-600'), 200);
+                });
+
+            } catch (error) {
+                console.error('Calculation error:', error);
+                alert('An error occurred while calculating the salary. Please try again.');
+            }
+        }
+    </script>
+</body>
+</html>
+</create_file>
+
+<thinking>
+Now that I've created the index.html file with all the necessary components, let me start a Python HTTP server to serve the file.
+</thinking>
+
+<execute_command>
+<command>python3 -m http.server 8000</command>
+</execute_command>
